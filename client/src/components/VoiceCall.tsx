@@ -15,7 +15,7 @@ interface VoiceCallProps {
   onEndCall: () => void;
 }
 
-export default function VoiceCall({ socket, user, partner, onEndCall }: VoiceCallProps) {
+export default function VoiceCall({ socket, partner, onEndCall }: VoiceCallProps) {
   const localAudioRef = useRef<HTMLAudioElement>(null);
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);

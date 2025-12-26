@@ -58,10 +58,6 @@ export default function Menu({
     onGetBlockedUsers();
   }, []);
 
-  const handleApplyColors = () => {
-    onUpdateSettings(textColor, bgColor);
-  };
-
   const handlePresetColor = (text: string, bg: string) => {
     setTextColor(text);
     setBgColor(bg);

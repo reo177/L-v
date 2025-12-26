@@ -28,7 +28,6 @@ interface ChatRoomProps {
   onSendMessage: (text: string) => void;
   onStartCall: (targetUser: User) => void;
   onBlockUser: (userId: string) => void;
-  onUnblockUser: (userId: string) => void;
   blockedUsers: Set<string>;
   socket: Socket | null;
 }
@@ -48,7 +47,6 @@ export default function ChatRoom({
   onSendMessage,
   onStartCall,
   onBlockUser,
-  onUnblockUser,
   blockedUsers
 }: ChatRoomProps) {
   const [messageText, setMessageText] = useState('');
@@ -68,8 +66,11 @@ export default function ChatRoom({
   };
 
   const filteredMessages = searchText
-    ? messages.filter(m => m.text.toLowerCase().includes(searchText.toLowerCase()))
-    : messages;
+    ? messages.filter(m => 
+        !blockedUsers.has(m.userId) && 
+        m.text.toLowerCase().includes(searchText.toLowerCase())
+      )
+    : messages.filter(m => !blockedUsers.has(m.userId));
 
   const filteredUsers = searchText
     ? users.filter(u => u.name.toLowerCase().includes(searchText.toLowerCase()) || u.id.toLowerCase().includes(searchText.toLowerCase()))

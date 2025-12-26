@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
 import ChatRoom from './components/ChatRoom';
 import UserSetup from './components/UserSetup';
@@ -162,7 +162,6 @@ function App() {
           onSendMessage={handleSendMessage}
           onStartCall={handleStartCall}
           onBlockUser={handleBlockUser}
-          onUnblockUser={handleUnblockUser}
           blockedUsers={blockedUsers}
           socket={socket}
         />
