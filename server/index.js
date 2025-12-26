@@ -36,6 +36,8 @@ io.on('connection', (socket) => {
       id: userData.id || socket.id,
       name: userData.name || '匿名ユーザー',
       icon: userData.icon || '👤',
+      textColor: userData.textColor,
+      bgColor: userData.bgColor,
       socketId: socket.id
     };
     users.set(socket.id, user);
@@ -55,7 +57,7 @@ io.on('connection', (socket) => {
         prevRoomUsers.delete(socket.id);
         io.to(currentRoom).emit('roomUsers', Array.from(prevRoomUsers).map(sid => {
           const u = users.get(sid);
-          return u ? { id: u.id, name: u.name, icon: u.icon, socketId: sid } : null;
+          return u ? { id: u.id, name: u.name, icon: u.icon, textColor: u.textColor, bgColor: u.bgColor, socketId: sid } : null;
         }).filter(Boolean));
       }
     }
@@ -71,7 +73,7 @@ io.on('connection', (socket) => {
       const roomUsersList = Array.from(roomUsersSet)
         .map(sid => {
           const u = users.get(sid);
-          return u ? { id: u.id, name: u.name, icon: u.icon, socketId: sid } : null;
+          return u ? { id: u.id, name: u.name, icon: u.icon, textColor: u.textColor, bgColor: u.bgColor, socketId: sid } : null;
         })
         .filter(Boolean);
       io.to(roomId).emit('roomUsers', roomUsersList);
@@ -89,6 +91,8 @@ io.on('connection', (socket) => {
         userId: user.id,
         userName: user.name,
         userIcon: user.icon,
+        userTextColor: user.textColor,
+        userBgColor: user.bgColor,
         text: messageData.text,
         timestamp: new Date().toISOString(),
         roomId: roomId
@@ -120,6 +124,31 @@ io.on('connection', (socket) => {
   socket.on('getBlockedUsers', () => {
     const blockedSet = blockedUsers.get(socket.id);
     socket.emit('blockedUsers', Array.from(blockedSet || []));
+  });
+
+  // ユーザー設定更新（色情報）
+  socket.on('updateUserSettings', (settings) => {
+    const user = users.get(socket.id);
+    if (user) {
+      user.textColor = settings.textColor;
+      user.bgColor = settings.bgColor;
+      users.set(socket.id, user);
+      
+      // 部屋内の他のユーザーに更新を通知
+      const roomId = userRooms.get(socket.id);
+      if (roomId) {
+        const roomUsersSet = roomUsers.get(roomId);
+        if (roomUsersSet) {
+          const roomUsersList = Array.from(roomUsersSet)
+            .map(sid => {
+              const u = users.get(sid);
+              return u ? { id: u.id, name: u.name, icon: u.icon, textColor: u.textColor, bgColor: u.bgColor, socketId: sid } : null;
+            })
+            .filter(Boolean);
+          io.to(roomId).emit('roomUsers', roomUsersList);
+        }
+      }
+    }
   });
 
   // 通話開始（シグナリング）- 部屋内でのみ
@@ -177,7 +206,7 @@ io.on('connection', (socket) => {
           const roomUsersList = Array.from(roomUsersSet)
             .map(sid => {
               const u = users.get(sid);
-              return u ? { id: u.id, name: u.name, icon: u.icon, socketId: sid } : null;
+              return u ? { id: u.id, name: u.name, icon: u.icon, textColor: u.textColor, bgColor: u.bgColor, socketId: sid } : null;
             })
             .filter(Boolean);
           io.to(roomId).emit('roomUsers', roomUsersList);

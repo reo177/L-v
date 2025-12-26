@@ -163,7 +163,19 @@ export default function VoiceCall({ socket, partner, onEndCall }: VoiceCallProps
       <div className="bg-gray-800 border-b-2 border-white p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">{partner.icon}</span>
+            <img
+              src={partner.icon}
+              alt={partner.name}
+              className="w-8 h-8 rounded-full object-cover border-2 border-white"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const fallback = document.createElement('span');
+                fallback.className = 'text-2xl';
+                fallback.textContent = '👤';
+                target.parentNode?.appendChild(fallback);
+              }}
+            />
             <div>
               <h3 className="font-bold text-white">{partner.name}</h3>
               <p className="text-xs text-gray-400">ID: {partner.id}</p>
@@ -179,7 +191,19 @@ export default function VoiceCall({ socket, partner, onEndCall }: VoiceCallProps
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center p-6 space-y-4">
-        <div className="text-6xl mb-4">{partner.icon}</div>
+        <img
+          src={partner.icon}
+          alt={partner.name}
+          className="w-24 h-24 rounded-full object-cover border-4 border-white mb-4"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+            const fallback = document.createElement('div');
+            fallback.className = 'text-6xl mb-4';
+            fallback.textContent = '👤';
+            target.parentNode?.appendChild(fallback);
+          }}
+        />
         <div className="text-center">
           <div className="font-semibold text-lg text-white">{partner.name}</div>
           <div className="text-sm text-gray-400 mt-1">

@@ -1,22 +1,47 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 interface UserSetupProps {
   onRegister: (name: string, id: string, icon: string, textColor?: string, bgColor?: string) => void;
 }
 
-const ICONS = ['👤', '😀', '😎', '🤖', '🐱', '🐶', '🦊', '🐻', '🐼', '🦁', '🐯', '🐸', '🐵', '🦄', '🐝', '🦋'];
-
 export default function UserSetup({ onRegister }: UserSetupProps) {
   const [name, setName] = useState('');
   const [id, setId] = useState('');
-  const [selectedIcon, setSelectedIcon] = useState('👤');
+  const [iconPreview, setIconPreview] = useState<string | null>(null);
   const [textColor, setTextColor] = useState('#FFFFFF');
   const [bgColor, setBgColor] = useState('#000000');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // ファイルサイズチェック（5MB以下）
+      if (file.size > 5 * 1024 * 1024) {
+        alert('画像サイズは5MB以下にしてください');
+        return;
+      }
+
+      // 画像形式チェック
+      if (!file.type.startsWith('image/')) {
+        alert('画像ファイルを選択してください');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        setIconPreview(result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim() && id.trim()) {
-      onRegister(name.trim(), id.trim(), selectedIcon, textColor, bgColor);
+    if (name.trim() && id.trim() && iconPreview) {
+      onRegister(name.trim(), id.trim(), iconPreview, textColor, bgColor);
+    } else if (!iconPreview) {
+      alert('アイコン画像を選択してください');
     }
   };
 
@@ -58,24 +83,51 @@ export default function UserSetup({ onRegister }: UserSetupProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              アイコン
+              アイコン画像
             </label>
-            <div className="grid grid-cols-8 gap-2">
-              {ICONS.map((icon) => (
-                <button
-                  key={icon}
-                  type="button"
-                  onClick={() => setSelectedIcon(icon)}
-                  className={`text-2xl p-2 rounded-lg transition-all border-2 ${
-                    selectedIcon === icon
-                      ? 'bg-white text-black border-white scale-110'
-                      : 'bg-gray-800 border-white text-white hover:bg-gray-700'
-                  }`}
-                >
-                  {icon}
-                </button>
-              ))}
+            <div className="space-y-4">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full px-4 py-3 bg-gray-800 border-2 border-white text-white rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                画像を選択
+              </button>
+              {iconPreview && (
+                <div className="mt-4">
+                  <div className="text-sm text-gray-400 mb-2">プレビュー:</div>
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={iconPreview}
+                      alt="アイコンプレビュー"
+                      className="w-20 h-20 rounded-full object-cover border-2 border-white"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIconPreview(null);
+                        if (fileInputRef.current) {
+                          fileInputRef.current.value = '';
+                        }
+                      }}
+                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      削除
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
+            <p className="text-xs text-gray-400 mt-2">
+              ※ 画像サイズは5MB以下、対応形式: JPG, PNG, GIF, WebP
+            </p>
           </div>
 
           <div>

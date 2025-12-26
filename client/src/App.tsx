@@ -20,6 +20,8 @@ interface Message {
   userId: string;
   userName: string;
   userIcon: string;
+  userTextColor?: string;
+  userBgColor?: string;
   text: string;
   timestamp: string;
   roomId?: string;
@@ -132,8 +134,11 @@ function App() {
   };
 
   const handleUpdateUserSettings = (textColor?: string, bgColor?: string) => {
-    if (user) {
-      setUser({ ...user, textColor, bgColor });
+    if (user && socket) {
+      const updatedUser = { ...user, textColor, bgColor };
+      setUser(updatedUser);
+      // サーバーに色情報を更新
+      socket.emit('updateUserSettings', { textColor, bgColor });
     }
   };
 

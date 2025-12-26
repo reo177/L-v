@@ -29,7 +29,19 @@ export default function RoomSelector({ rooms, onJoinRoom, user }: RoomSelectorPr
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold text-white mb-4">部屋を選択</h1>
           <div className="flex items-center justify-center gap-4 text-white bg-gray-800 border-2 border-white rounded-lg p-4 inline-flex">
-            <span className="text-3xl">{user.icon}</span>
+            <img
+              src={user.icon}
+              alt={user.name}
+              className="w-12 h-12 rounded-full object-cover border-2 border-white"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const fallback = document.createElement('span');
+                fallback.className = 'text-3xl';
+                fallback.textContent = '👤';
+                target.parentNode?.appendChild(fallback);
+              }}
+            />
             <div className="text-left">
               <p className="font-bold text-lg">{user.name}</p>
               <p className="text-sm text-gray-400">ID: {user.id}</p>

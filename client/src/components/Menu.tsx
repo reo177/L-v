@@ -269,7 +269,19 @@ export default function Menu({
                 </div>
                 <div className="p-4 bg-gray-800 border-2 border-white rounded-lg">
                   <div className="text-sm text-gray-400 mb-1">あなたのアイコン</div>
-                  <div className="text-3xl">{user.icon}</div>
+                  <img
+                    src={user.icon}
+                    alt={user.name}
+                    className="w-16 h-16 rounded-full object-cover border-2 border-white"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const fallback = document.createElement('div');
+                      fallback.className = 'text-3xl';
+                      fallback.textContent = '👤';
+                      target.parentNode?.appendChild(fallback);
+                    }}
+                  />
                 </div>
               </div>
             </div>

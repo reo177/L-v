@@ -15,6 +15,8 @@ interface Message {
   userId: string;
   userName: string;
   userIcon: string;
+  userTextColor?: string;
+  userBgColor?: string;
   text: string;
   timestamp: string;
   roomId?: string;
@@ -82,7 +84,19 @@ export default function ChatRoom({
       <div className="bg-gray-900 border-b-2 border-white p-4 shadow-lg">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">{user.icon}</span>
+            <img
+              src={user.icon}
+              alt={user.name}
+              className="w-8 h-8 rounded-full object-cover border-2 border-white"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const fallback = document.createElement('span');
+                fallback.className = 'text-2xl';
+                fallback.textContent = '👤';
+                target.parentNode?.appendChild(fallback);
+              }}
+            />
             <div>
               <h2 className="font-bold text-lg text-white">{user.name}</h2>
               <p className="text-sm text-gray-400">ID: {user.id} | {ROOM_NAMES[currentRoom] || currentRoom}</p>
@@ -123,9 +137,20 @@ export default function ChatRoom({
                     className={`flex gap-3 ${isOwnMessage ? 'flex-row-reverse' : ''}`}
                   >
                     <div className="flex-shrink-0">
-                      <div className="w-10 h-10 rounded-full bg-gray-800 border-2 border-white flex items-center justify-center text-xl">
-                        {message.userIcon}
-                      </div>
+                      <img
+                        src={message.userIcon}
+                        alt={message.userName}
+                        className="w-10 h-10 rounded-full object-cover border-2 border-white"
+                        onError={(e) => {
+                          // 画像読み込みエラー時のフォールバック
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const fallback = document.createElement('div');
+                          fallback.className = 'w-10 h-10 rounded-full bg-gray-800 border-2 border-white flex items-center justify-center text-xl';
+                          fallback.textContent = '👤';
+                          target.parentNode?.appendChild(fallback);
+                        }}
+                      />
                     </div>
                     <div
                       className={`max-w-xs lg:max-w-md ${isOwnMessage ? 'items-end' : ''}`}
@@ -141,6 +166,12 @@ export default function ChatRoom({
                             ? {
                                 backgroundColor: user.bgColor,
                                 color: user.textColor
+                              }
+                            : !isOwnMessage && message.userTextColor && message.userBgColor
+                            ? {
+                                backgroundColor: message.userBgColor,
+                                color: message.userTextColor,
+                                border: '2px solid white'
                               }
                             : {}
                         }
@@ -207,7 +238,19 @@ export default function ChatRoom({
                   key={u.socketId}
                   className="flex items-center gap-3 p-3 bg-gray-800 border-2 border-white rounded-lg hover:bg-gray-700 transition-colors"
                 >
-                  <div className="text-2xl">{u.icon}</div>
+                  <img
+                    src={u.icon}
+                    alt={u.name}
+                    className="w-8 h-8 rounded-full object-cover border-2 border-white"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const fallback = document.createElement('div');
+                      fallback.className = 'text-2xl';
+                      fallback.textContent = '👤';
+                      target.parentNode?.appendChild(fallback);
+                    }}
+                  />
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold text-sm text-white truncate">{u.name}</div>
                     <div className="text-xs text-gray-400 truncate">ID: {u.id}</div>
