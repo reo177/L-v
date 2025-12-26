@@ -1,0 +1,21 @@
+{
+  "name": "anonymous-chat-site",
+  "version": "1.0.0",
+  "description": "匿名チャットサイト - 名前・ID・アイコンを自由に設定してチャットと通話ができる",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && nodemon index.js",
+    "dev:client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "start": "cd server && node index.js"
+  },
+  "keywords": ["chat", "anonymous", "webrtc", "realtime"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.0.2"
+  }
+}
+
